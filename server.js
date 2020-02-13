@@ -7,6 +7,7 @@ const mysql = require('./api/index.js');
 const session=require("express-session");
 const MySQLStore=require('express-mysql-session')(session);
 const md5 = require('blueimp-md5')
+let url = require('url')
 
 let multer = require("multer");
 let storage = multer.diskStorage({
@@ -14,7 +15,9 @@ let storage = multer.diskStorage({
         cb(null, './uploads');
     },
     filename: function(req, file, cb) {
-        cb(null, `${Date.now()}-${file.originalname}`)
+       let url1 = url.parse(req.url, true).query.username
+        
+        cb(null, `${url1}-${file.originalname}`)
     }
 })
 let upload = multer({ storage: storage });

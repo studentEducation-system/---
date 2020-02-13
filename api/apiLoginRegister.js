@@ -16,7 +16,13 @@ function findUser(sqlWord,callback){
 
 function updateUser(sqlWord,callback){
     let connection = mysql();
-    connection.query("update userlogin set password = '" + sqlWord.password + "', avatar = '"+ sqlWord.avatar +"' where username = '" + sqlWord.username + "'",(err,data)=>{
+    let query = '';
+    if(sqlWord.avatar){
+        query = "update userlogin set password = '" + sqlWord.password + "', avatar = '"+ sqlWord.avatar +"' where username = '" + sqlWord.username + "'"
+    }else{
+        query = "update userlogin set password = '" + sqlWord.password + "' where username = '" + sqlWord.username + "'"
+    }
+    connection.query(query,(err,data)=>{
         if(err){
             console.log(err)
             callback(err)
@@ -63,17 +69,17 @@ function signOutLogin(sqlWord,callback){
     connection.end()
 }
 
-function uploadAvatar(sqlWord,callback){
-    let connection = mysql();
-    connection.query("insert into userlogin(avatar) values('"+ sqlWord +"') ",(err,data)=>{
-        if(err){
-            callback(err)
-        }else{ 
-            callback(data)
-        }
-    })
-    connection.end()
-}
+// function uploadAvatar(sqlWord,callback){
+//     let connection = mysql();
+//     connection.query("insert into userlogin(avatar) values('"+ sqlWord +"') ",(err,data)=>{
+//         if(err){
+//             callback(err)
+//         }else{ 
+//             callback(data)
+//         }
+//     })
+//     connection.end()
+// }
 
 module.exports = {
     findUser,
@@ -81,5 +87,4 @@ module.exports = {
     applyCount,
     judgeLogin,
     signOutLogin,
-    uploadAvatar
 }
