@@ -1,8 +1,8 @@
-let sqlFunc = require('./api/apiLoginRegister.js')
+let sqlFunc = require('../api/apiLoginRegister.js')
 let fs = require('fs');
 let url = require('url')
 
-module.exports = (app, md5, upload) => {
+module.exports = (app, md5, upload,dirname) => {
     getMd5 = (password) => {
         return md5(md5(password))
     }
@@ -56,50 +56,62 @@ module.exports = (app, md5, upload) => {
             password: md5(md5(req.body.password)),
             avatar:req.files[0]&&req.files[0].filename? req.files[0].filename : ''
         };
-        sqlFunc.updateUser(queryCondition, (data) => {
-            if (data && data.affectedRows != 0) {
-                res.send(JSON.stringify({
-                    statusCode: 200,
-                    updated: true,
-                    message: '修改成功,请重新登录'
-                }));
-            } else {
-                res.send(JSON.stringify({
-                    statusCode: 200,
-                    updated: false,
-                    message: '密码重复'
-                }))
-            }
-        });
-        
-        sqlFunc.findUser(queryCondition.username, (data) => {
-            if (data.length) {
-                let avatar = data[0].avatar;
-                if (avatar) {
-                fs.readdir('./uploads/', function (err, files) {
-                        let filterFile = files.filter((ele)=>{
-                            return ele.indexOf(queryCondition.username) == 0 && ele != avatar;
 
-                        })
-                        filterFile.forEach((ele) => {
-                            if(ele!=''){
-                                fs.unlink('./uploads/'+ ele, (err) => {
-                                    if (err) {
-                                        console.log(err);
-                                        res.send({
-                                            message:'服务器错误，头像上传失败'
-                                        })
-                                    } else {
-                                        console.log('已经删除')
-                                    }
-                                })
-                            }
-                            
-                        })
-                    });
+        let operationUser = new Promise((resolve,reject)=>{
+            sqlFunc.updateUser(queryCondition, (data) => {
+                if (data && data.affectedRows != 0) {
+                    resolve(res)
+                } else {
+                   reject(res)
                 }
-            }
+            });
+        }).then((res)=>{
+            res.send(JSON.stringify({
+                statusCode: 200,
+                updated: true,
+                message: '修改成功,请重新登录'
+            }));
+        },(rej)=>{
+            rej.send(JSON.stringify({
+                statusCode: 200,
+                updated: false,
+                message: '密码重复'
+            }))
+        }).then(()=>{
+            return new Promise((resolve,reject)=>{
+                sqlFunc.findUser(queryCondition.username, (data) => {
+                    if (data.length) {
+                        let avatar = data[0].avatar;
+                        if (avatar) {
+                        fs.readdir('./uploads/', function (err, files) {
+                                let filterFile = files.filter((ele)=>{
+                                    return ele.indexOf(queryCondition.username) == 0 && ele != avatar;
+        
+                                })
+                                filterFile.forEach((ele) => {
+                                    if(ele!=''){
+                                        fs.unlink('./uploads/'+ ele, (err) => {
+                                            if (err) {
+                                                console.log(err);
+                                                res.send({
+                                                    message:'服务器错误，头像上传失败'
+                                                })
+                                            } else {
+                                                console.log('已经删除')
+                                            }
+                                        })
+                                    }
+                                    
+                                })
+                            });
+                        }
+                    }
+                })
+            })
         })
+        
+        
+       
       
 
 
@@ -112,7 +124,7 @@ module.exports = (app, md5, upload) => {
             if (data.length) {
                 let avatar = data[0].avatar;
                 if (avatar) {
-                    res.sendFile(__dirname + '/uploads/' + avatar)
+                    res.sendFile(dirname + '/uploads/' + avatar)
                 }
             }
         })
@@ -178,16 +190,4 @@ module.exports = (app, md5, upload) => {
 
     })
 
-    // app.post('/uploadAvatar', (req, res) => {
-    //     let queryCondition = req.body.avatar;
-    //     sqlFunc.uploadAvatar(queryCondition, (data) => {
-    //         if (data) {
-    //             res.send(true);
-    //         } else {
-    //             res.send(false)
-    //         }
-    //     });
-
-
-    // })
 }

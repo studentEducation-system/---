@@ -2,7 +2,7 @@ let express = require('express');
 let app = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');//获取post请求参数插件
-const router = require('./router.js');
+const router = require('./router/index.js');
 const mysql = require('./api/index.js');
 const session=require("express-session");
 const MySQLStore=require('express-mysql-session')(session);
@@ -46,7 +46,7 @@ app.use(session({
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
-    cookie: ('name', 'value',{  maxAge:  60*60*1000,
+    cookie: ('name', 'value',{  maxAge:  6*60*60*1000,
                                 secure: false,
                                 name: "seName",
                                 resave: false})
@@ -57,8 +57,8 @@ app.use(bodyParser.urlencoded({ extended: false }));//解析post请求数据
 app.use(cors()); //cors解决跨域
 
 
-router(app,md5,upload)
+router(app,md5,upload,__dirname)
 
 app.listen('12306', () => {
-    console.log('服务器已经启动')
+    console.log('服务器经启动')
 })
