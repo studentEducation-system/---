@@ -62,9 +62,25 @@ function addEducationInfo(sqlWord,callback){
     })
     connection.end()
 }
+
+function addInternshipInfo(sqlWord,callback){
+    let connection = mysql();
+    let query = '';
+    query = "update person_resume set internshipinfo = '" + sqlWord.data + "' where operator = '" + sqlWord.operator + "'"
+    connection.query(query,(err,data)=>{
+        if(err){
+            console.log(err)
+            callback(err)
+        }else{ 
+            callback(data)
+        }
+    })
+    connection.end()
+}
 module.exports = {
     addPersonResume,
     findPersonResume,
     editPersonResume,
-    addEducationInfo
+    addEducationInfo,
+    addInternshipInfo
 }

@@ -121,5 +121,53 @@ module.exports = (app, md5, upload) => {
         })
 
     })
-    
+
+    app.post('/addInternshipInfo', function (req, res) {
+       
+        let sqlWord = {
+            operator:req.body.operator,
+            data: JSON.stringify(req.body) 
+        }
+        console.log(sqlWord)
+
+        sqlFunc.addInternshipInfo(sqlWord,(data)=>{
+            console.log(data,124)
+            if(data.affectedRows){
+                res.send(JSON.stringify({
+                    statusCode: 200,
+                    message: '保存成功'
+                }));
+            }else{
+                res.send(JSON.stringify({
+                    statusCode: 500,
+                    message: '服务器错误'
+                }));
+            }
+        })
+
+    })
+    app.post('/editInternshipInfo', function (req, res) {
+       
+        let sqlWord = {
+            operator:req.body.operator,
+            data: JSON.stringify(req.body) 
+        }
+        console.log(sqlWord)
+
+        sqlFunc.addInternshipInfo(sqlWord,(data)=>{
+            console.log(data,124)
+            if(data.affectedRows){
+                res.send(JSON.stringify({
+                    statusCode: 200,
+                    message: '修改成功'
+                }));
+            }else{
+                res.send(JSON.stringify({
+                    statusCode: 500,
+                    message: '服务器错误'
+                }));
+            }
+        })
+
+    })
 }
